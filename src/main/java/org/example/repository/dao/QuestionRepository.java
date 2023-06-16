@@ -1,6 +1,7 @@
 package org.example.repository.dao;
 
 import org.example.model.Question;
+import org.example.repository.QuestionariumSingleton;
 
 public interface QuestionRepository {
 
@@ -11,5 +12,9 @@ public interface QuestionRepository {
     boolean remove(int id);
 
     int update(Question question);
+
+    Question getRandom();
+
+    Question getRandomByTopic(String topicName);
 
 }
