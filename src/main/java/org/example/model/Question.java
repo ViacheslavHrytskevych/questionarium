@@ -3,7 +3,6 @@ package org.example.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -12,7 +11,7 @@ public class Question {
 
     private int id;
 
-    private String question;
+    private String textQuestion;
 
     private int topicId;
 

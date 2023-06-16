@@ -1,17 +1,13 @@
 package service;
 
 import org.example.model.Question;
-import org.example.model.Topic;
 import org.example.service.QuestionService;
-import org.example.service.TopicService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class QuestionServiceTest {
 
@@ -27,7 +23,7 @@ public class QuestionServiceTest {
     public void addQuestion() {
         QuestionService questionService = new QuestionService(questionRepositoryMock);
         Question question = Question.builder()
-                .question("What is SQL")
+                .textQuestion("What is SQL")
                 .topicId(23)
                 .build();
         questionService.addQuestion(question);
@@ -40,7 +36,7 @@ public class QuestionServiceTest {
         QuestionService questionService = new QuestionService(questionRepositoryMock);
         Question question = Question.builder()
                 .id(1)
-                .question("What is SQL")
+                .textQuestion("What is SQL")
                 .topicId(23)
                 .build();
         questionService.addQuestion(question);
@@ -55,19 +51,19 @@ public class QuestionServiceTest {
         QuestionService questionService = new QuestionService(questionRepositoryMock);
         Question question = Question.builder()
                 .id(1)
-                .question("What is SQL")
+                .textQuestion("What is SQL")
                 .topicId(23)
                 .build();
         questionService.addQuestion(question);
         question = Question.builder()
                 .id(2)
-                .question("What is Spring")
+                .textQuestion("What is Spring")
                 .topicId(22)
                 .build();
         questionService.addQuestion(question);
         question = Question.builder()
                 .id(3)
-                .question("What is Loop")
+                .textQuestion("What is Loop")
                 .topicId(21)
                 .build();
         questionService.addQuestion(question);

@@ -59,7 +59,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 
             return Question.builder()
                     .id(resultSet.getInt("id"))
-                    .question(resultSet.getString("question"))
+                    .textQuestion(resultSet.getString("question"))
                     .build();
 
         } catch (SQLException e) {
@@ -72,7 +72,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(save);
 
-            preparedStatement.setString(1, question.getQuestion());
+            preparedStatement.setString(1, question.getTextQuestion());
             preparedStatement.setInt(2, question.getTopicId());
             return preparedStatement.execute();
 
@@ -100,7 +100,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 
             PreparedStatement preparedStatement = connection.prepareStatement(update);
             preparedStatement.setInt(1, question.getId());
-            preparedStatement.setString(2, question.getQuestion());
+            preparedStatement.setString(2, question.getTextQuestion());
             preparedStatement.setInt(3, question.getTopicId());
 
             return preparedStatement.executeUpdate();
@@ -120,7 +120,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
                 String questionText = resultSet.getString("text_question");
 
                 Question question = Question.builder()
-                        .question(questionText)
+                        .textQuestion(questionText)
                         .build();
 
                 return question;
@@ -143,7 +143,7 @@ public class QuestionRepositoryImpl implements QuestionRepository {
                 String questionText = resultSet.getString("text_question");
 
                 Question question = Question.builder()
-                        .question(questionText)
+                        .textQuestion(questionText)
                         .build();
 
                 return question;
