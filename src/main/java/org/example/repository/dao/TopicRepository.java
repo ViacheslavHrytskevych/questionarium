@@ -2,6 +2,8 @@ package org.example.repository.dao;
 
 import org.example.model.Topic;
 
+import java.util.List;
+
 public interface TopicRepository {
 
     boolean save(Topic topic);
@@ -11,5 +13,7 @@ public interface TopicRepository {
     boolean remove(int id);
 
     int update(Topic topic);
+
+    List<Topic> getAll();
 
 }

@@ -1,9 +1,14 @@
 package org.example.repository;
 
+import org.example.exception.IdNotFoundException;
+import org.example.exception.IncorrectQueryException;
 import org.example.model.Topic;
 import org.example.repository.dao.TopicRepository;
 
+import javax.xml.transform.Result;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TopicRepositoryImpl implements TopicRepository {
 
@@ -11,24 +16,29 @@ public class TopicRepositoryImpl implements TopicRepository {
 
     private static final String save =
             """
-                    INSERT INTO public.topic(
+                    INSERT INTO topic(
                     name)
                     VALUES (?)
             """;
 
     private static final String remove =
             """
-                    DELETE FROM public.topic
+                    DELETE FROM topic
                     WHERE id = ?
                                 
             """;
 
     private static final String update =
             """
-                    UPDATE public.topic
+                    UPDATE topic
                     SET name=?
                     WHERE  id = ?;
                                         
+            """;
+
+    private static final String getAll =
+            """
+                   SELECT * FROM topic;
             """;
 
     public TopicRepositoryImpl(Connection connection) {
@@ -40,16 +50,14 @@ public class TopicRepositoryImpl implements TopicRepository {
 
         try {
             Statement statement = this.connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("Select * from games where name = " + id);
+            ResultSet resultSet = statement.executeQuery("Select * from topic where id = " + id);
             resultSet.next();
-
-            return Topic.builder()
-                    .id(resultSet.getInt("id"))
-                    .name(resultSet.getString("name"))
-                    .build();
+            Topic topic = new Topic(resultSet.getString("name"));
+            topic.setId(resultSet.getInt("id"));
+            return topic;
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IdNotFoundException(e.getMessage());
         }
     }
 
@@ -58,12 +66,11 @@ public class TopicRepositoryImpl implements TopicRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(save);
 
-            preparedStatement.setInt(1, topic.getId());
-            preparedStatement.setString(2, topic.getName());
+            preparedStatement.setString(1, topic.getName());
             return preparedStatement.execute();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IncorrectQueryException(e.getMessage());
         }
 
     }
@@ -77,7 +84,7 @@ public class TopicRepositoryImpl implements TopicRepository {
             preparedStatement.setInt(1, id);
             return preparedStatement.execute();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IdNotFoundException(e.getMessage());
         }
     }
 
@@ -92,7 +99,23 @@ public class TopicRepositoryImpl implements TopicRepository {
             return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IncorrectQueryException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Topic> getAll() {
+        try {
+
+            PreparedStatement preparedStatement = connection.prepareStatement(getAll);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Topic> topics = new ArrayList<>();
+            while (resultSet.next()) {
+                topics.add(new Topic(resultSet.getInt("id"), resultSet.getString("name")));
+            }
+            return topics;
+        } catch (SQLException e) {
+            throw new IncorrectQueryException(e.getMessage());
         }
     }
 
