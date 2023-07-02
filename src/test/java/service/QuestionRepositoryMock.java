@@ -12,8 +12,6 @@ import java.util.Map;
 
 public class QuestionRepositoryMock implements QuestionRepository {
 
-
-
     private List<Question> questions;
     public List<Question> getQuestions() {
         return questions;
@@ -28,7 +26,6 @@ public class QuestionRepositoryMock implements QuestionRepository {
         this.questions = new ArrayList<>();
         this.questionByTopic = new HashMap<>();
     }
-
 
     @Override
     public boolean save(Question question) {
@@ -48,18 +45,17 @@ public class QuestionRepositoryMock implements QuestionRepository {
     }
 
     @Override
-    public Question getRandom() {   // тут не понимаю что делать
+    public Question getRandom() {
         int random = (int)Math.floor(Math.random()*questions.size());
         return questions.get(random);
 
     }
 
     @Override
-    public Question getRandomByTopic(String topicName) {  // тут не понимаю что делать
+    public Question getRandomByTopic(String topicName) {
         int size = questionByTopic.get(topicName).size();
         int random = (int)Math.floor(Math.random()*size);
         return questionByTopic.get(topicName).get(random);
-
     }
 
     @Override

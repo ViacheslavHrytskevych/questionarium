@@ -18,10 +18,7 @@ public class TopicServiceTest {
     @Test
     public void saveTopicTest() {
         TopicService topicService = new TopicService(topicRepositoryMock);
-        Topic topic = Topic.builder() //эти данные мы закидываем в Лист в Мокм,  чтобы их потом из этого листа вытащить тестируя метод
-                .name("List")
-                .id(100)
-                .build();
+        Topic topic = new Topic(100, "List");
 
         topicService.saveTopic(topic);
 
@@ -31,11 +28,7 @@ public class TopicServiceTest {
     @Test
     public void getTest() {
         TopicService topicService = new TopicService(topicRepositoryMock);
-        Topic topic = Topic.builder()  //эти данные мы закидываем в Лист в Мокм,  чтобы их потом из этого листа вытащить тестируя метод
-                .name("SQL")
-                .id(99)
-
-                .build();
+        Topic topic = new Topic(99, "SQL");
         topicRepositoryMock.topics.add(topic);
 
         Topic expected = topicService.get(topic.getId());

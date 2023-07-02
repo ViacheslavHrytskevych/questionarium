@@ -1,7 +1,11 @@
 package org.example.repository;
 
+import org.example.exception.IdNotFoundException;
+import org.example.exception.IncorrectQueryException;
+import org.example.exception.NotFoundQuestionException;
 import org.example.model.Question;
 import org.example.repository.dao.QuestionRepository;
+
 import java.sql.*;
 
 public class QuestionRepositoryImpl implements QuestionRepository {
@@ -10,40 +14,40 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 
     private static final String save =
             """
-                    INSERT INTO public.question(
-                    question, topic_id)
-                    VALUES (?, ?)
-            """;
+                            INSERT INTO question(
+                            text_question)
+                            VALUES (?)
+                    """;
 
     private static final String remove =
             """
-                    DELETE FROM public.question
-                    WHERE id = ?
-                                
-            """;
+                            DELETE FROM public.question
+                            WHERE id = ?
+                                        
+                    """;
 
     private static final String update =
             """
-                    UPDATE public.question
-                    SET question = ?, topic_id = ?
-                    WHERE  id = ?;
-                                        
-            """;
+                            UPDATE public.question
+                            SET text_question = ?, topic_id = ?
+                            WHERE  id = ?;
+                                                
+                    """;
     private static final String getRandom =
             """
-                    SELECT question.text_question FROM Question 
-                    ORDER BY RAND()
-                    LIMIT 1;
-                                        
-            """;
+                            SELECT question.text_question FROM Question 
+                            ORDER BY RANDOM()
+                            LIMIT 1;
+                                                
+                    """;
     private static final String getRandomByTopic =
             """
-                    SELECT q.text_question, t.name FROM Question AS q JOIN Topic AS t ON q.topic_id = t.id
-                    WHERE t.name = ?
-                    ORDER BY RAND()
-                    LIMIT 1;
-                                        
-            """;
+                            SELECT q.text_question, t.name FROM Question AS q JOIN Topic AS t ON q.topic_id = t.id
+                            WHERE t.name = ?
+                            ORDER BY RANDOM()
+                            LIMIT 1;
+                                                
+                    """;
 
     public QuestionRepositoryImpl(Connection connection) {
         this.connection = connection;
@@ -54,16 +58,16 @@ public class QuestionRepositoryImpl implements QuestionRepository {
 
         try {
             Statement statement = this.connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("Select * from games where name = " + id);
+            ResultSet resultSet = statement.executeQuery("Select * from question where id = " + id);
             resultSet.next();
 
             return Question.builder()
                     .id(resultSet.getInt("id"))
-                    .textQuestion(resultSet.getString("question"))
+                    .question(resultSet.getString("question"))
                     .build();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IdNotFoundException(e.getMessage());
         }
     }
 
@@ -72,17 +76,16 @@ public class QuestionRepositoryImpl implements QuestionRepository {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(save);
 
-            preparedStatement.setString(1, question.getTextQuestion());
-            preparedStatement.setInt(2, question.getTopicId());
+            preparedStatement.setString(1, question.getQuestion());
             return preparedStatement.execute();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IncorrectQueryException(e.getMessage());
         }
     }
 
     @Override
-    public boolean remove(int id) {
+    public boolean remove(int id) throws IdNotFoundException {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(remove);
@@ -90,23 +93,22 @@ public class QuestionRepositoryImpl implements QuestionRepository {
             preparedStatement.setInt(1, id);
             return preparedStatement.execute();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IdNotFoundException(e.getMessage());
         }
     }
 
     @Override
     public int update(Question question) {
-        try {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(update);) {
 
-            PreparedStatement preparedStatement = connection.prepareStatement(update);
             preparedStatement.setInt(1, question.getId());
-            preparedStatement.setString(2, question.getTextQuestion());
+            preparedStatement.setString(2, question.getQuestion());
             preparedStatement.setInt(3, question.getTopicId());
 
             return preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IncorrectQueryException(e.getMessage());
         }
     }
 
@@ -119,15 +121,12 @@ public class QuestionRepositoryImpl implements QuestionRepository {
             if (resultSet.next()) {
                 String questionText = resultSet.getString("text_question");
 
-                Question question = Question.builder()
-                        .textQuestion(questionText)
+                return Question.builder()
+                        .question(questionText)
                         .build();
-
-                return question;
             } else {
-                throw new RuntimeException("There are no questions available in the Question table.");
+                throw new NotFoundQuestionException("There are no available questions on this topic in the Question table.");
             }
-
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -143,12 +142,12 @@ public class QuestionRepositoryImpl implements QuestionRepository {
                 String questionText = resultSet.getString("text_question");
 
                 Question question = Question.builder()
-                        .textQuestion(questionText)
+                        .question(questionText)
                         .build();
 
                 return question;
             } else {
-                throw new RuntimeException("There are no available questions on this topic in the Question table.");
+                throw new NotFoundQuestionException("There are no available questions on this topic in the Question table.");
             }
 
         } catch (SQLException e) {
